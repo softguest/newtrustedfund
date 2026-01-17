@@ -33,7 +33,32 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#c52222ff", // your brand color
+          colorBackground: "#ffffffff",
+          colorText: "#525252ff",
+          colorInputBackground: "#020617",
+          colorInputText: "#e5e7eb",
+          borderRadius: "0.75rem",
+          fontFamily: "Inter, sans-serif",
+        },
+        elements: {
+          card: "bg-slate-950 border border-slate-800 shadow-xl",
+          headerTitle: "text-xl font-bold text-white",
+          headerSubtitle: "text-slate-400",
+          formButtonPrimary:
+            "bg-green-500 hover:bg-green-600 text-black font-semibold",
+          socialButtonsBlockButton:
+            "border border-slate-700 hover:bg-slate-800",
+          formFieldInput:
+            "bg-slate-950 border-slate-700 focus:ring-green-500",
+          footerActionText: "text-slate-400",
+          footerActionLink: "text-green-400 hover:text-green-300",
+        },
+      }}
+      >
       <html 
       // lang="en" className={`${inter.variable} ${poppins.variable}`}
       >

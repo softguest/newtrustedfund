@@ -1,175 +1,115 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useSignIn, useSignUp } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import type React from "react"
 
+import { Target, Users, Landmark, Sparkles } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { LoginForm } from "./LoginForm"
 
-export default function AuthPage() {
-  const [mode, setMode] = useState<"login" | "signup" | "verify">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const { signIn, setActive: setActiveSignIn } = useSignIn();
-  const { signUp, setActive: setActiveSignUp } = useSignUp();
-
-  const handleGoogle = async () => {
-    if (!signIn) return;
-    await signIn.authenticateWithRedirect({
-      strategy: "oauth_google",
-      redirectUrl: "/sso-callback",
-      redirectUrlComplete: "/dashboard",
-    });
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (mode === "login") {
-        const res = await signIn?.create({ identifier: email, password });
-        if (res?.status === "complete") {
-          // setActiveSignIn may be undefined depending on the Clerk hook return type,
-          // so guard the call with optional chaining to avoid invoking undefined.
-          await setActiveSignIn?.({ session: res.createdSessionId });
-          location.href = "/dashboard";
-        }
-      }
-
-      if (mode === "signup") {
-        const res = await signUp?.create({ emailAddress: email, password });
-        await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
-        setMode("verify");
-      }
-
-      if (mode === "verify") {
-        const res = await signUp?.attemptEmailAddressVerification({ code });
-        if (res?.status === "complete") {
-          await setActiveSignUp?.({ session: res.createdSessionId });
-          location.href = "/dashboard";
-        }
-      }
-    } catch (err: any) {
-      setError(err?.errors?.[0]?.message || "Authentication failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function LoginPage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-white via-slate-100 to-red-200 text-slate-900 overflow-hidden">
-      {/* <ThreeBackground /> */}
-      <div className="flex grid grid-cols-1 md:grid-cols-2 min-h-screen">
-        <div className="hidden md:flex items-center justify-center bg-red-600 text-white p-10 space-x-2">
-          {/* Right side can be used for additional graphics or left empty */}
-          <div className="h-8 w-8 bg-white rounded-full mb-4" />
-          <h1 className="text-4xl font-extrabold mb-4">TrustFund</h1>
-        </div>
-        <div className="">
-          <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
-            <div
-              // initial={{ opacity: 0, y: 40 }}
-              // animate={{ opacity: 1, y: 0 }}
-              // transition={{ duration: 0.8 }}
-              className="w-full max-w-md rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-8 shadow-2xl"
-            >
-              <div className="mb-8 text-center">
-                <h1 className="text-3xl font-bold">
-                  {mode === "login" && "Welcome Back"}
-                  {mode === "signup" && "Create Account with"}
-                  {mode === "verify" && "Verify Email"}
-                </h1>
-                <h1 className="text-2xl font-bold text-red-600">TrustFund</h1>
-                <p className="mt-2 text-sm text-slate-600">
-                  {mode === "verify"
-                    ? "Enter the verification code sent to your email"
-                    : "Secure access to your dashboard"}
-                </p>
-              </div>
+    <main className="min-h-screen bg-white">
+      {/* DESKTOP VIEW */}
+      <div className="hidden md:flex min-h-screen">
+        {/* LEFT SECTION: Red Side */}
+        <section className="relative w-[55%] flex flex-col items-center justify-center p-16 text-white overflow-hidden">
+          <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,#510813_0%,#9a1026_100%)]" />
 
-              <div className="space-y-4">
-                {mode !== "verify" && (
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                )}
-
-                {mode !== "verify" && (
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                )}
-
-                {mode === "verify" && (
-                  <input
-                    type="text"
-                    placeholder="Verification code"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                )}
-
-                {error && (
-                  <p className="rounded-lg bg-red-100 px-3 py-2 text-sm text-red-600">
-                    {error}
-                  </p>
-                )}
-
-                <Button
-                  // whileHover={{ scale: 1.03 }}
-                  // whileTap={{ scale: 0.97 }}
-                  disabled={loading}
-                  onClick={handleSubmit}
-                  className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white shadow-lg disabled:opacity-60"
-                >
-                  {loading
-                    ? "Processing..."
-                    : mode === "login"
-                    ? "Sign In"
-                    : mode === "signup"
-                    ? "Create Account"
-                    : "Verify Email"}
-                </Button>
-
-                {mode !== "verify" && (
-                  <button
-                    onClick={handleGoogle}
-                    className="w-full rounded-xl border bg-white py-3 font-medium shadow hover:bg-slate-50"
-                  >
-                    Continue with Google
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-6 text-center text-sm text-slate-600">
-                {mode === "login" && (
-                  <button onClick={() => setMode("signup")} className="text-indigo-600 hover:underline">
-                    Don’t have an account? Sign up
-                  </button>
-                )}
-                {mode === "signup" && (
-                  <button onClick={() => setMode("login")} className="text-indigo-600 hover:underline">
-                    Already have an account? Sign in
-                  </button>
-                )}
-              </div>
+          <div className="relative z-20 w-full max-w-2xl flex flex-col items-center text-center">
+            <div className="mb-12 w-full max-w-[400px]">
+              <Image
+                src="/images/20251229-104326.png"
+                alt="CSTrustFunds"
+                width={500}
+                height={150}
+                className="w-full h-auto object-contain"
+                priority
+              />
             </div>
+
+            <div className="max-w-md mb-16">
+              <p className="text-sm md:text-base text-white/90 leading-relaxed font-sans tracking-wide">
+                CSTrustFunds Provides Purpose-driven savings for people, families, and communities
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-12 gap-y-10 w-full max-w-xl px-4">
+              <FeatureItem icon={<Target className="w-5 h-5" />} label="Personal Goal Saving" />
+              <FeatureItem icon={<Users className="w-5 h-5" />} label="Community & Group Savings" />
+              <FeatureItem icon={<Landmark className="w-5 h-5" />} label="Loans & Credit Support" />
+              <FeatureItem icon={<Sparkles className="w-5 h-5" />} label="AI SmartSave Assistant" />
+            </div>
+          </div>
+        </section>
+
+        {/* RIGHT SECTION: White Side */}
+        <section className="w-[45%] flex items-center justify-center p-12 bg-white">
+          <div className="w-full max-w-md">
+            <div className="mb-10">
+              <h2 className="text-3xl font-bold text-zinc-900 mb-2">Sign In</h2>
+              <p className="text-zinc-500 font-sans">Access your CSTrustFunds dashboard.</p>
+            </div>
+
+            <LoginForm />
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-zinc-500">
+                New to the platform?{" "}
+                <Link href="/signup" className="font-bold text-brand-red hover:text-brand-dark">
+                  Get Started
+                </Link>
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* MOBILE VIEW */}
+      <div className="md:hidden h-screen flex flex-col items-center justify-center p-6 bg-white overflow-hidden">
+        <div className="w-full max-w-sm mx-auto flex flex-col h-full justify-center">
+          {/* Logo at top */}
+          <div className="mb-6 w-full max-w-[200px] mx-auto">
+            <Image
+              src="/images/20251229-103148.png"
+              alt="CSTrustFunds"
+              width={500}
+              height={150}
+              className="w-full h-auto object-contain"
+              priority
+            />
+          </div>
+
+          <div className="mb-6">
+            <h2 className="font-bold text-zinc-900 text-center text-xl">Sign into Your Dashboard</h2>
+          </div>
+
+          <div className="mb-4">
+            <LoginForm />
+          </div>
+
+          <div className="text-center pt-2">
+            <p className="text-sm text-zinc-600 mb-3">New to the platform?</p>
+            <Link
+              href="/signup"
+              className="block w-full py-3 px-6 rounded-xl bg-white border-2 border-zinc-200 hover:border-zinc-300 transition-all"
+            >
+              <span className="text-brand-red font-bold text-base">Get Started</span>
+            </Link>
           </div>
         </div>
       </div>
+    </main>
+  )
+}
+
+function FeatureItem({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex items-center gap-4 text-left group">
+      <div className="shrink-0 w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 group-hover:bg-white/25 transition-all">
+        {icon}
+      </div>
+      <span className="text-sm font-semibold text-white/95">{label}</span>
     </div>
-  );
+  )
 }

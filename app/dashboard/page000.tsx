@@ -21,8 +21,8 @@ export default function DashboardPage() {
                   To access all features including creating or joining savings groups and communities, you need to
                   complete your KYC verification. This is required for regulatory compliance and your security.
                 </p>
-                <Link href="/dashboard/verify-kyc">
-                  <Button className="bg-brand-wine cursor-pointer hover:opacity-90 text-white rounded-lg font-bold">
+                <Link href="/verify-kyc">
+                  <Button className="bg-brand-wine hover:opacity-90 text-white rounded-lg font-bold">
                     Complete Verification
                   </Button>
                 </Link>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl shadow-sm border border-zinc-100 p-6">
             <h3 className="font-bold text-zinc-900 mb-2">Personal Savings</h3>
             <p className="text-sm text-zinc-600 mb-4">Create and manage your personal savings goals</p>
-            <Button className="w-full bg-brand-wine cursor-pointer hover:opacity-90 text-white rounded-lg font-bold">
+            <Button className="w-full bg-brand-wine hover:opacity-90 text-white rounded-lg font-bold">
               Get Started
             </Button>
           </div>

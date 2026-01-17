@@ -5,9 +5,6 @@ import TransactionList from '@/components/dashboardtwo/TransactionList';
 import AllTopGroups from '@/components/AllTopGroups';
 import { getUserAccounts, getRecentTransactions } from '@/_actions/getAccounts';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import CardMenu from '@/components/dashboardtwo/CardMenu';
-import { Button } from '@/components/ui/button';
-import CreateSections from '@/components/dashboardtwo/CreateSections';
 
 export default async function Dashboard() {
   // 🔐 user is guaranteed by layout
@@ -26,13 +23,15 @@ export default async function Dashboard() {
           {/* Left Column */}
           <div className="space-y-6">
             {/* Stats Cards */}
-            <section className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* <StatsCard title="Current Account Balance" balance={current?.balance ?? 0} change="+16%" /> */}
               <StatsCard title="Savings Account Balance" balance={savings?.balance ?? 0} change="-0.6%" />
             </section>
-          
-            <CardMenu />
 
-            <CreateSections />
+            {/* Money Flow Chart */}
+            <div className="w-full rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-md p-4">
+              <MoneyFlowChart />
+            </div>
 
             {/* Target Goals List */}
             <div className="w-full rounded-2xl bg-white/20 backdrop-blur-xl border border-white/20 shadow-md p-4">
